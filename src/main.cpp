@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <UNOR4WMatrixGFX.h>
+#include <list.cpp>
+
+Array<int> ls;
 
 UNOR4WMatrixGFX display;
 
@@ -17,6 +20,23 @@ void setup()
 {
     Serial.begin(115200);
 
+    // ls.addElement(100);
+    // ls.addElement(101);
+    // ls.addElement(102);
+    // ls.addElement(103);
+    // ls.addElement(104);
+
+    // // ls.removeElement(0);
+    // ls.printArray();
+
+    // Serial.println();
+    // Serial.println(ls.getElementCount());
+
+    // while (1)
+    // {
+    //     /* code */
+    // }
+
     display.begin();
 
     Serial.println("--------------------");
@@ -30,6 +50,13 @@ void setup()
 void loop()
 {
     reqLiftKeyBtnHeadler();
+
+    if (ls.getElementCount() > 0) // if is any requests
+    {
+        if (flLastFlag == 0) // if is finised lifting current floor
+            flSet = ls.getElementByIdx(0);
+    }
+
     mooveHeadler();
 }
 
@@ -37,30 +64,43 @@ void reqLiftKeyBtnHeadler()
 {
     if (Serial.available())
     {
-        flSet = Serial.parseInt();
-        bool success = inRange(flSet, 0, 11);
+        // int date = Serial.read() - 48;
+        int date = Serial.parseInt();
+        bool success = inRange(date, 0, 11);
 
         if (success)
         {
             Serial.println("-------");
             Serial.print("Set: ");
-            Serial.println(flSet);
+            Serial.println(date);
             Serial.println("-------");
 
-            drawPixel(flSet, 2, true);
+            drawPixel(date, 2, true); // show requested floor on display
+            ls.addElement(date);
+
+            Serial.print("Floors: ");
+
+            for (size_t i = 0; i < ls.getElementCount(); i++)
+            {
+                Serial.print(ls.getElementByIdx(i));
+
+                if (i != ls.getElementCount() - 1)
+                    Serial.print(", ");
+            }
+
+            Serial.print(" (" + String(ls.getElementCount()) + ")");
+            Serial.println();
         }
         else
         {
             Serial.println("Error input");
-
-            flSet = fl;
         }
     }
 }
 
 void mooveHeadler()
 {
-    if (millis() - tm > 250)
+    if (millis() - tm > 500)
     {
         tm = millis();
 
@@ -107,14 +147,21 @@ void mooveHeadler()
                 }
 
                 drawPixel(fl, 2, false);
+                ls.removeElement(0);
 
                 serialIndicate();
 
-                // flSet = 0; // go to the zero floor
                 flLastFlag = 0;
             }
             else
+            {
                 drawPixel(fl, 2, false); // if request lift from same floor
+
+                for (size_t i = 0; i <= ls.getElementCount(); i++) // cleal list
+                {
+                    ls.removeElement(i);
+                }
+            }
         }
     }
 }
