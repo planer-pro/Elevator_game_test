@@ -10,35 +10,33 @@ int fl = 0, flSet = 0, flLastFlag = 0;
 uint32_t tm = 0;
 uint8_t cnt = 0;
 
-void drawPixel(uint8_t x, uint8_t y, bool on);
-void serialIndicate();
-void mooveHeadler();
+void startPreparation();
+void checkLiftReqHeadler();
+void requestManager();
+void mooveLiftHeadler();
 bool inRange(int value, int min, int max);
-void reqLiftKeyBtnHeadler();
+void serialIndicate();
+void drawPixel(uint8_t x, uint8_t y, bool on);
 
 void setup()
 {
     Serial.begin(115200);
-
-    // ls.addElement(100);
-    // ls.addElement(101);
-    // ls.addElement(102);
-    // ls.addElement(103);
-    // ls.addElement(104);
-
-    // // ls.removeElement(0);
-    // ls.printArray();
-
-    // Serial.println();
-    // Serial.println(ls.getElementCount());
-
-    // while (1)
-    // {
-    //     /* code */
-    // }
+    Serial.setTimeout(150);
 
     display.begin();
 
+    startPreparation();
+}
+
+void loop()
+{
+    checkLiftReqHeadler();
+    requestManager();
+    mooveLiftHeadler();
+}
+
+void startPreparation()
+{
     Serial.println("--------------------");
     Serial.print("You on the floor: ");
     Serial.println(fl);
@@ -47,24 +45,10 @@ void setup()
     drawPixel(fl, 0, true);
 }
 
-void loop()
-{
-    reqLiftKeyBtnHeadler();
-
-    if (ls.getElementCount() > 0) // if is any requests
-    {
-        if (flLastFlag == 0) // if is finised lifting current floor
-            flSet = ls.getElementByIdx(0);
-    }
-
-    mooveHeadler();
-}
-
-void reqLiftKeyBtnHeadler()
+void checkLiftReqHeadler()
 {
     if (Serial.available())
     {
-        // int date = Serial.read() - 48;
         int date = Serial.parseInt();
         bool success = inRange(date, 0, 11);
 
@@ -98,9 +82,19 @@ void reqLiftKeyBtnHeadler()
     }
 }
 
-void mooveHeadler()
+void requestManager()
 {
-    if (millis() - tm > 500)
+    if (ls.getElementCount() > 0) // if is any requests
+    {
+        if (flLastFlag == 0) // if is finised lifting current floor
+            flSet = ls.getElementByIdx(0);
+    }
+}
+
+void mooveLiftHeadler()
+{
+
+    if (millis() - tm > 500) // elevatror speed
     {
         tm = millis();
 
@@ -155,9 +149,9 @@ void mooveHeadler()
             }
             else
             {
-                drawPixel(fl, 2, false); // if request lift from same floor
+                drawPixel(fl, 2, false); // block lift request, if him on the same floor
 
-                for (size_t i = 0; i <= ls.getElementCount(); i++) // cleal list
+                for (size_t i = 0; i <= ls.getElementCount(); i++) // cleal wrong list
                 {
                     ls.removeElement(i);
                 }
