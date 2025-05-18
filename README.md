@@ -1,4 +1,4 @@
-# Программа эмуляции поведения лифта для 12-этажного дома на основе LED матрицы UNO R4
+# Программа эмуляции поведения лифта для 12-этажного дома на основе LED матрицы ARDUINO UNO R4.
 
 ## Описание
 В терминале, с помощью цифровых клавиш от 0 до 11, пользователь вводит номер этажа, на который должен приехать лифт. После нажатия клавиши на LED матрице отображаются этажи, где запланированы остановки лифта.
@@ -7,7 +7,7 @@
 
 ---
 
-# Elevator Behavior Simulation Program for 12-Story Building using UNO R4 LED Matrix
+# Elevator Behavior Simulation Program for 12-Story Building using ARDUINO UNO R4 LED Matrix.
 
 ## Description
 In the terminal, using numeric keys 0-11, the user enters the target floor number. After pressing a key, the LED matrix displays the floors where the elevator will stop.
