@@ -12,10 +12,10 @@ uint8_t cnt = 0;
 
 void startPreparation();
 void checkLiftReqHeadler();
-void requestManager();
+void requestManagerHeadler();
 void mooveLiftHeadler();
 bool inRange(int value, int min, int max);
-void serialIndicate();
+void serialDebugMessage();
 void drawPixel(uint8_t x, uint8_t y, bool on);
 
 void setup()
@@ -31,7 +31,7 @@ void setup()
 void loop()
 {
     checkLiftReqHeadler();
-    requestManager();
+    requestManagerHeadler();
     mooveLiftHeadler();
 }
 
@@ -82,7 +82,7 @@ void checkLiftReqHeadler()
     }
 }
 
-void requestManager()
+void requestManagerHeadler()
 {
     if (ls.getElementCount() > 0) // if is any requests
     {
@@ -93,8 +93,7 @@ void requestManager()
 
 void mooveLiftHeadler()
 {
-
-    if (millis() - tm > 500) // elevatror speed
+    if (millis() - tm > 500) // 500 ms elevatror speed
     {
         tm = millis();
 
@@ -102,7 +101,7 @@ void mooveLiftHeadler()
         {
             flLastFlag = -1;
 
-            serialIndicate();
+            serialDebugMessage();
 
             drawPixel(fl, 0, true);
 
@@ -115,7 +114,7 @@ void mooveLiftHeadler()
         {
             flLastFlag = 1;
 
-            serialIndicate();
+            serialDebugMessage();
 
             drawPixel(fl, 0, true);
 
@@ -143,7 +142,7 @@ void mooveLiftHeadler()
                 drawPixel(fl, 2, false);
                 ls.removeElement(0);
 
-                serialIndicate();
+                serialDebugMessage();
 
                 flLastFlag = 0;
             }
@@ -151,7 +150,7 @@ void mooveLiftHeadler()
             {
                 drawPixel(fl, 2, false); // block lift request, if him on the same floor
 
-                for (size_t i = 0; i <= ls.getElementCount(); i++) // cleal wrong list
+                for (size_t i = 0; i <= ls.getElementCount(); i++) // clear wrong list
                 {
                     ls.removeElement(i);
                 }
@@ -165,7 +164,7 @@ bool inRange(int value, int min, int max)
     return (value >= min && value <= max);
 }
 
-void serialIndicate()
+void serialDebugMessage()
 {
     Serial.print(fl);
     Serial.print(" -> ");
